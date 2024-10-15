@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
 
-namespace ToDoApi.Application.ToDoCommandsQueries.Commands.Delete
+namespace ToDoApi.Application.ToDoCommandsQueries.Commands.Delete;
+
+public class DeleteTodoCommand : IRequest<bool>
 {
-    internal class DeleteTodoCommand
-    {
-    }
+    public long Id { get; set; }
 }

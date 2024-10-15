@@ -4,7 +4,9 @@ namespace ToDoApi.Domain.Interfaces;
 
 public interface IToDoRepository
 {
-    Task<long> Create(ToDoItem model);
-    Task<ToDoItem> GetById(long id);
-    void SaveChanges();
+    Task<long> CreateAsync(ToDoItem model);
+    Task<bool> UpdateAsync(long id, string context, bool iscompleted);
+    Task<bool> DeleteAsync(long id);
+    Task<ToDoItem> GetByIdAsync(long id);
+    Task<IEnumerable<ToDoItem>> GetAllAsync(long id);
 }

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+using ToDoApi.Domain.Entities;
 
-namespace ToDoApi.Application.ToDoCommandsQueries.Queries.GetTodos
+namespace ToDoApi.Application.ToDoCommandsQueries.Queries.GetTodos;
+
+public class GetTodosQuery : IRequest<IEnumerable<ToDoItem>>
 {
-    internal class GetTodosQuery
-    {
-    }
+    public long UserId { get; set; }
 }
+

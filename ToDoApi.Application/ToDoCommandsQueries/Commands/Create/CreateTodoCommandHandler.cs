@@ -16,7 +16,7 @@ namespace ToDoApi.Application.ToDoCommandsQueries.Commands.Create
 
         public async Task<long> Handle(CreateTodoCommand request, CancellationToken cancellationToken)
         {
-            var result = await _todoRepository.Create(new ToDoItem(request.Context, false, request.UserId));
+            var result = await _todoRepository.CreateAsync(new ToDoItem(request.Context, false, request.UserId));
 
             return result;
         }

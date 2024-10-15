@@ -14,16 +14,9 @@ public class UpdateTodoCommandHandler : IRequestHandler<UpdateTodoCommand, bool>
 
     public async Task<bool> Handle(UpdateTodoCommand request, CancellationToken cancellationToken)
     {
-        var todo = await _todoRepository.GetById(request.Id);
+        var result = await _todoRepository.UpdateAsync(request.Id, request.Context, request.IsComplete);
 
-        if (todo == null) return false;
-
-        todo.Context = request.Context;
-        todo.IsComplete = request.IsComplete;
-
-        _todoRepository.SaveChanges();
-
-        return true;
+        return result;
     }
 }
 
