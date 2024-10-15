@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using ToDoApi.Core.ToDoDtosProfiles.Dtos;
+using ToDoApi.Domain.Entities;
 
-namespace ToDoApi.Core.ToDoDtosProfiles.Profiles
+namespace ToDoApi.Core.ToDoDtosProfiles.Profiles;
+
+public class TodoProfile : Profile
 {
-    internal class TodoProfile
+    public TodoProfile()
     {
+        CreateMap<ToDoItem, TodoItemDto>().ReverseMap();
     }
 }
+

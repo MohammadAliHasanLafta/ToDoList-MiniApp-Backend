@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+namespace ToDoApi.Core.ToDoDtosProfiles.Dtos;
 
-namespace ToDoApi.Core.ToDoDtosProfiles.Dtos
+public class TodoItemDto
 {
-    internal class TodoItemDto
-    {
-    }
+    public string? Context { get; set; }
+    public bool IsComplete { get; set; }
 }
