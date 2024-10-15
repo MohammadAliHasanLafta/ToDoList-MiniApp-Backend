@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
 
-namespace ToDoApi.Application.ToDoCommandsQueries.Commands.Update
+namespace ToDoApi.Application.ToDoCommandsQueries.Commands.Update;
+
+public class UpdateTodoCommand : IRequest<bool>
 {
-    internal class UpdateTodoCommand
-    {
-    }
+    public long Id { get; set; }
+    public string? Context { get; set; }
+    public bool IsComplete { get; set; }
 }
+

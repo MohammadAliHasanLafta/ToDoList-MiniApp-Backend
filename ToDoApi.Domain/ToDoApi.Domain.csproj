@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ToDoApi.Application\ToDoApi.Application.csproj" />
     <ProjectReference Include="..\ToDoApi.Core\ToDoApi.Core.csproj" />
   </ItemGroup>
 

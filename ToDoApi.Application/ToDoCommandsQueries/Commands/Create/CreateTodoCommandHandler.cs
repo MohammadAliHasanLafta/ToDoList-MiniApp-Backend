@@ -1,33 +1,24 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ToDoApi.Domain.Entities;
+using ToDoApi.Domain.Interfaces;
 
 namespace ToDoApi.Application.ToDoCommandsQueries.Commands.Create
 {
     public class CreateTodoCommandHandler : IRequestHandler<CreateTodoCommand, long>
     {
-        private readonly ICreateToDoRepository createoRepo;
-        public CreateTodoCommandHandler(TodoContext context)
+
+        private readonly IToDoRepository _todoRepository;
+
+        public CreateTodoCommandHandler(IToDoRepository todoRepository)
         {
-            _context = context;
+            _todoRepository = todoRepository;
         }
 
         public async Task<long> Handle(CreateTodoCommand request, CancellationToken cancellationToken)
         {
-            var newTodo = new TodoItem
-            {
-                Title = request.Context,
-                UserId = request.UserId,
-                IsComplete = false
-            };
+            var result = await _todoRepository.Create(new ToDoItem(request.Context, false, request.UserId));
 
-            _context.TodoItems.Add(newTodo);
-            await _context.SaveChangesAsync();
-
-            return newTodo.Id;
+            return result;
         }
     }
 
