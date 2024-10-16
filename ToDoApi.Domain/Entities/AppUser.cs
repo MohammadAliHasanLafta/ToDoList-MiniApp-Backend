@@ -2,7 +2,18 @@
 
 namespace ToDoApi.Domain.Entities;
 
-public class AppUser : EntityBase
+public class AppUser 
 {
-    public long TelegramId { get; set; }
+    public AppUser(string id, string firstName, string userName)
+    {
+        Id = id;
+        FirstName = firstName;
+        UserName = userName;
+    }
+
+    public string Id { get; set; }
+    public string FirstName { get; set; }
+    public string UserName { get; set; }
+
+
 }
