@@ -19,7 +19,7 @@ namespace ToDoApi.Application.ToDoCommandsQueries.Commands.Create
         public async Task<long> Handle(CreateTodoCommand request, CancellationToken cancellationToken)
         {
             var userId = _profileService.GetUserId();
-            var result = await _todoRepository.CreateAsync(new ToDoItem(request.Context, false, userId));
+            var result = await _todoRepository.CreateAsync(new ToDoItem(request.Context, false, request.UserId));
 
             return result;
         }

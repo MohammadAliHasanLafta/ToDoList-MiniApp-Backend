@@ -1,47 +1,41 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Create;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Delete;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Update;
 using ToDoApi.Application.ToDoCommandsQueries.Queries.GetTodos;
 using ToDoApi.Core.ToDoDtosProfiles.Dtos;
-using ToDoApi.Domain.Interfaces;
 
 namespace ToDoApi.API.Controllers;
 
 [ApiController]
 [Route("api/v1/todo")]
-[Authorize]
 public class TodoController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IProfileService _profileService;
 
-    public TodoController(IMediator mediator, IProfileService profileService)
+    public TodoController(IMediator mediator)
     {
         _mediator = mediator;
-        _profileService = profileService;
     }
 
-    [HttpGet("get-all-todos")]
-    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos()
+    [HttpGet("get-all-todos/{userId}")]
+    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos(long userId)
     {
-        var query = new GetTodosQuery();
+        var query = new GetTodosQuery { UserId = userId };
         var todos = await _mediator.Send(query);
         return Ok(todos);
     }
 
-    [HttpPost]
+    [HttpPost("create-todo")]
     public async Task<ActionResult<long>> CreateTodo(CreateTodoCommand command)
     {
         var result = await _mediator.Send(command);
         return Ok(result);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("update-todo/{id}")]
     public async Task<IActionResult> UpdateTodo(long id, UpdateTodoCommand command)
     {
         if (id != command.Id) return BadRequest();
@@ -52,7 +46,7 @@ public class TodoController : ControllerBase
         return Ok(result);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("remove-todo/{id}")]
     public async Task<IActionResult> DeleteTodo(long id)
     {
         var result = await _mediator.Send(new DeleteTodoCommand { Id = id });

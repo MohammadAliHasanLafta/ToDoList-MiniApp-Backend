@@ -55,7 +55,7 @@ public class ToDoRepository : IToDoRepository
         return true;
     }
 
-    public async Task<IEnumerable<ToDoItem>> GetAllAsync(string id)
+    public async Task<IEnumerable<ToDoItem>> GetAllAsync(long id)
     {
         return _context.TodoItems
             .Where(todo => todo.UserId == id && todo.IsDeleted == false)

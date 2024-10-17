@@ -5,5 +5,6 @@ namespace ToDoApi.Application.ToDoCommandsQueries.Queries.GetTodos;
 
 public class GetTodosQuery : IRequest<IEnumerable<ToDoItem>>
 {
+    public long UserId { get; set; }
 }
 
