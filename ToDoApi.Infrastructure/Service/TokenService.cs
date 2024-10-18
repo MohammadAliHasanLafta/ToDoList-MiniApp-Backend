@@ -26,7 +26,7 @@ namespace ToDoApi.Infrastructure.Service
             var authClaims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-            new Claim(ClaimTypes.NameIdentifier, user.Id),
+            new Claim(ClaimTypes.NameIdentifier, user.FirstName),
         };
 
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));

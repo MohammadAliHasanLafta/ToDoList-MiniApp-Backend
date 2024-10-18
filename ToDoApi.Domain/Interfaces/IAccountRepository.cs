@@ -9,10 +9,10 @@ namespace ToDoApi.Domain.Interfaces
 {
     public interface IAccountRepository
     {
-        public void AddUser(AppUser user);
-        public bool UserIsExist(AppUser user);
-        public bool VerifyTelegramInitData(string initData);
-        public AppUser ParseUserData(string initData);
-        public byte[] ExtractHashFromInitData(string initData);
+        public Task<long> AddUser(AppUser user);
+        public bool UserIsExist(long userId);
+        //public bool VerifyTelegramInitData(string initData);
+        //public AppUser ParseUserData(string initData);
+        //public byte[] ExtractHashFromInitData(string initData);
     }
 }

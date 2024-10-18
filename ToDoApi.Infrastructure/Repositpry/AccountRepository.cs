@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
@@ -21,40 +16,44 @@ namespace ToDoApi.Infrastructure.Repositpry
             _context = context;
         }
 
-        public void AddUser(AppUser user)
+        public async Task<long> AddUser(AppUser user)
         {
-            _context.Users.Add(user);
+            _context.Users.AddAsync(user);
+            _context.SaveChanges();
+
+            Console.WriteLine("Hello Hello!");
+            return user.UserId;
         }
-        public bool UserIsExist(AppUser user)
+        public bool UserIsExist(long userId)
         {
-            return _context.Users.Any(u => u.Id == user.Id);
-        }
-
-        public bool VerifyTelegramInitData(string initData)
-        {
-            var secretKey = Encoding.UTF8.GetBytes("WebAppData" + _telegramToken);
-            using var hmac = new HMACSHA256(secretKey);
-
-            var initDataHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(initData));
-
-            // Validate initData with the expected hash (from Telegram)
-            var hash = ExtractHashFromInitData(initData); // Implement this function
-            return initDataHash.SequenceEqual(hash);
+            return _context.Users.Any(u => u.UserId == userId);
         }
 
-        public AppUser ParseUserData(string initData)
-        {
-            var parsedData = System.Web.HttpUtility.ParseQueryString(initData);
-            return new AppUser(parsedData["id"], parsedData["first_name"], parsedData["username"]);
+        //public bool VerifyTelegramInitData(string initData)
+        //{
+        //    var secretKey = Encoding.UTF8.GetBytes("WebAppData" + _telegramToken);
+        //    using var hmac = new HMACSHA256(secretKey);
 
-        }
+        //    var initDataHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(initData));
 
-        public byte[] ExtractHashFromInitData(string initData)
-        {
-            var parsedData = System.Web.HttpUtility.ParseQueryString(initData);
-            var hashString = parsedData["hash"];
-            return Convert.FromBase64String(hashString);
-        }
+        //    // Validate initData with the expected hash (from Telegram)
+        //    var hash = ExtractHashFromInitData(initData); // Implement this function
+        //    return initDataHash.SequenceEqual(hash);
+        //}
+
+        //public AppUser ParseUserData(string initData)
+        //{
+        //    var parsedData = System.Web.HttpUtility.ParseQueryString(initData);
+        //    return new AppUser(parsedData["id"], parsedData["first_name"], parsedData["username"]);
+
+        //}
+
+        //public byte[] ExtractHashFromInitData(string initData)
+        //{
+        //    var parsedData = System.Web.HttpUtility.ParseQueryString(initData);
+        //    var hashString = parsedData["hash"];
+        //    return Convert.FromBase64String(hashString);
+        //}
     }
 
 }

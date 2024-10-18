@@ -2,18 +2,20 @@
 
 namespace ToDoApi.Domain.Entities;
 
-public class AppUser 
+public class AppUser : EntityBase
 {
-    public AppUser(string id, string firstName, string userName)
+    public AppUser(long id, string firstName, string userName, string initdata)
     {
-        Id = id;
+        UserId = id;
         FirstName = firstName;
         UserName = userName;
+        Initdata = initdata;
     }
 
-    public string Id { get; set; }
+    public long UserId { get; set; }
     public string FirstName { get; set; }
     public string UserName { get; set; }
+    public string Initdata { get; set; }
 
 
 }
