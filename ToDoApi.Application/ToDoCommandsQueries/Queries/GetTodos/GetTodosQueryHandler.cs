@@ -8,12 +8,10 @@ namespace ToDoApi.Application.ToDoCommandsQueries.Queries.GetTodos;
 public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, IEnumerable<ToDoItem>>
 {
     private readonly IToDoRepository _todoRepository;
-    private readonly IProfileService _profileService;
 
-    public GetTodosQueryHandler(IToDoRepository todoRepository, IProfileService profileService)
+    public GetTodosQueryHandler(IToDoRepository todoRepository)
     {
         _todoRepository = todoRepository;
-        _profileService = profileService;
     }
 
     public async Task<IEnumerable<ToDoItem>> Handle(GetTodosQuery request, CancellationToken cancellationToken)

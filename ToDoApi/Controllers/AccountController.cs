@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography;
-using System.Text;
-using ToDoApi.Core.ToDoDtosProfiles;
 using ToDoApi.Core.ToDoDtosProfiles.Dtos;
-using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
-using ToDoApi.Infrastructure.Data;
 
 namespace ToDoApi.Application.Controllers;
 
@@ -16,13 +11,11 @@ public class AccountController : ControllerBase
 {
     private readonly IAccountRepository _accountRepo;
     private readonly ITokenService _tokenService;
-    private readonly AppDbContext _context;
 
-    public AccountController(IAccountRepository accountRepo, ITokenService tokenService, AppDbContext context)
+    public AccountController(IAccountRepository accountRepo, ITokenService tokenService)
     {
         _accountRepo = accountRepo;
         _tokenService = tokenService;
-        _context = context;
     }
 
     [HttpPost("verify-initdata")]

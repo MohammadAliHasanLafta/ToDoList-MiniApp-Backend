@@ -1,8 +1,8 @@
-﻿using Azure.Core;
-using Microsoft.EntityFrameworkCore;
+﻿
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
 using ToDoApi.Infrastructure.Data;
+
 
 namespace ToDoApi.Infrastructure.Repositpry;
 
@@ -32,6 +32,7 @@ public class ToDoRepository : IToDoRepository
 
         todo.Context = context;
         todo.IsComplete = iscompleted;
+        todo.UpdatedAt = DateTime.Now;
 
         _context.SaveChanges();
 

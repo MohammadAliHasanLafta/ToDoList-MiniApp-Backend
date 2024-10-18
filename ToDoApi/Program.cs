@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Create;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Delete;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Update;
@@ -12,14 +11,13 @@ using ToDoApi.Core.ToDoDtosProfiles.Profiles;
 using ToDoApi.Domain.Interfaces;
 using ToDoApi.Infrastructure.Data;
 using ToDoApi.Infrastructure.Repositpry;
-using ToDoApi.Infrastructure.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(7298); 
-});
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(7298); 
+//});
 
 builder.Services.AddCors(options =>
 {
@@ -44,8 +42,8 @@ builder.Services.AddAutoMapper(typeof(TodoProfile).Assembly);
 
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IProfileService, ProfileService>();
+//builder.Services.AddScoped<ITokenService, TokenService>();
+//builder.Services.AddScoped<IProfileService, ProfileService>();
 
 builder.Services.AddHttpContextAccessor();
 
@@ -88,16 +86,18 @@ var app = builder.Build();
 
 app.UseCors("AllowAllOrigins");
 
+app.UseSwagger();
+app.UseSwaggerUI();
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-        c.RoutePrefix = string.Empty; 
-    });
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    app.UseSwaggerUI(c =>
+//    {
+//        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+//        c.RoutePrefix = string.Empty; 
+//    });
+//}
 
 app.UseHttpsRedirection();
 

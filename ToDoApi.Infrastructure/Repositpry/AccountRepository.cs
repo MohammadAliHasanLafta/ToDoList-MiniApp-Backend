@@ -5,7 +5,6 @@ using System.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
 using ToDoApi.Infrastructure.Data;
