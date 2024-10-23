@@ -21,7 +21,7 @@ namespace ToDoApi.Infrastructure.Service
             _configuration = configuration;
         }
 
-        public string CreateToken(AppUser user)
+        public string CreateToken(MiniAppUser user)
         {
             var authClaims = new List<Claim>
         {

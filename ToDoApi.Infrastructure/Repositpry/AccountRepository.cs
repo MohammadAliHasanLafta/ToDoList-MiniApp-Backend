@@ -1,5 +1,7 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
 using System.Text;
+using Telegram.Bot.Types;
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
 using ToDoApi.Infrastructure.Data;
@@ -16,17 +18,39 @@ namespace ToDoApi.Infrastructure.Repositpry
             _context = context;
         }
 
-        public async Task<long> AddUser(AppUser user)
+        public async Task<long> AddUser(MiniAppUser user)
         {
-            _context.Users.AddAsync(user);
+            _context.MiniAppUsers.AddAsync(user);
             _context.SaveChanges();
 
             Console.WriteLine("Hello Hello!");
             return user.UserId;
         }
-        public bool UserIsExist(long userId)
+
+        public async Task SaveChangesInUsers(string phoneNumber, string otp)
         {
-            return _context.Users.Any(u => u.UserId == userId);
+            var user = _context.WebAppUsers.SingleOrDefault(u => u.PhoneNumber == phoneNumber);
+            if (user == null)
+            {
+                user = new WebAppUser(phoneNumber, otp);
+                await _context.WebAppUsers.AddAsync(user);
+            }
+            else
+            {
+                user.Otp = otp;
+                _context.WebAppUsers.Update(user);
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        public bool UserIsExistById(long userId)
+        {
+            return _context.MiniAppUsers.Any(u => u.UserId == userId);
+        }
+
+        public WebAppUser GetUserByNumber(string phoneNumber)
+        {
+            return _context.WebAppUsers.FirstOrDefault(u => u.PhoneNumber == phoneNumber);
         }
 
         //public bool VerifyTelegramInitData(string initData)

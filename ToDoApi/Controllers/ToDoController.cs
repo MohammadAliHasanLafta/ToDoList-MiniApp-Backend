@@ -19,10 +19,9 @@ public class TodoController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("get-all-todos/{userId}")]
-    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos(long userId)
+    [HttpGet("get-all-todos")]
+    public async Task<ActionResult<IEnumerable<TodoItemDto>>> GetTodos([FromQuery] GetTodosQuery query)
     {
-        var query = new GetTodosQuery { UserId = userId };
         var todos = await _mediator.Send(query);
         return Ok(todos);
     }

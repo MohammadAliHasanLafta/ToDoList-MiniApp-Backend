@@ -16,7 +16,7 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, IEnumerable<T
 
     public async Task<IEnumerable<ToDoItem>> Handle(GetTodosQuery request, CancellationToken cancellationToken)
     {
-        var result = await _todoRepository.GetAllAsync(request.UserId);
+        var result = await _todoRepository.GetAllAsync(request.UserId, request.PhoneNumber);
 
         return result;
     }

@@ -7,4 +7,5 @@ public class CreateTodoCommand : IRequest<long>
 {
     public string? Context { get; set; }
     public long UserId { get; set; }
+    public string? PhoneNumber { get; set; }
 }

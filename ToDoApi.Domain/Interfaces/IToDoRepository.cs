@@ -8,5 +8,5 @@ public interface IToDoRepository
     Task<bool> UpdateAsync(long id, string context, bool iscompleted);
     Task<bool> DeleteAsync(long id);
     Task<ToDoItem> GetByIdAsync(long id);
-    Task<IEnumerable<ToDoItem>> GetAllAsync(long id);
+    Task<IEnumerable<ToDoItem>> GetAllAsync(long id, string phoneNumber);
 }

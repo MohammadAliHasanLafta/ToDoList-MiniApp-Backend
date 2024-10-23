@@ -11,6 +11,7 @@ using ToDoApi.Core.ToDoDtosProfiles.Profiles;
 using ToDoApi.Domain.Interfaces;
 using ToDoApi.Infrastructure.Data;
 using ToDoApi.Infrastructure.Repositpry;
+using ToDoApi.Infrastructure.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,10 +42,13 @@ builder.Services.AddAutoMapper(typeof(TodoProfile).Assembly);
 
 builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IOtpService, OtpService>();
+builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 //builder.Services.AddScoped<ITokenService, TokenService>();
 //builder.Services.AddScoped<IProfileService, ProfileService>();
 
 builder.Services.AddHttpContextAccessor();
+
 
 
 
@@ -53,7 +57,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -86,7 +90,7 @@ var app = builder.Build();
 app.UseCors("AllowAllOrigins");
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())

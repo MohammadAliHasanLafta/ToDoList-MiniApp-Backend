@@ -56,10 +56,16 @@ public class ToDoRepository : IToDoRepository
         return true;
     }
 
-    public async Task<IEnumerable<ToDoItem>> GetAllAsync(long id)
+    public async Task<IEnumerable<ToDoItem>> GetAllAsync(long userId,string phoneNumber)
     {
+        if (phoneNumber != null)
+            return _context.TodoItems
+            .Where(todo => todo.UserPhoneNumber == phoneNumber && todo.IsDeleted == false)
+            .ToList();
+
+
         return _context.TodoItems
-            .Where(todo => todo.UserId == id && todo.IsDeleted == false)
+            .Where(todo => todo.UserId == userId && todo.IsDeleted == false)
             .ToList();
     }
 }

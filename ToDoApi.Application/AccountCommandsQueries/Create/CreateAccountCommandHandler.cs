@@ -23,13 +23,13 @@ public class CreateAccountCommandHandler : IRequestHandler<CreateAccountCommand,
     {
         var userId = request.UserId;
 
-        if (_accountRepository.UserIsExist(userId))
+        if (_accountRepository.UserIsExistById(userId))
         {
             return 0000;
         }
 
 
-        var result = await _accountRepository.AddUser(new AppUser(request.UserId,request.FirstName,request.UserName,request.InitData));
+        var result = await _accountRepository.AddUser(new MiniAppUser(request.UserId,request.FirstName,request.UserName,request.InitData));
 
         return result;
     }
