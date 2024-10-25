@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Create;
 using ToDoApi.Application.ToDoCommandsQueries.Commands.Delete;
@@ -9,6 +10,7 @@ using ToDoApi.Core.ToDoDtosProfiles.Dtos;
 namespace ToDoApi.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("/")]
 public class TodoController : ControllerBase
 {

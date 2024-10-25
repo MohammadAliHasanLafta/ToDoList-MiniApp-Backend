@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToDoApi.Application.ProfileCommandsQueries.Commands.Delete;
 using ToDoApi.Application.ProfileCommandsQueries.Commands.Update;
@@ -8,6 +9,7 @@ using ToDoApi.Domain.Entities;
 namespace ToDoApi.API.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("/")]
 public class ProfileContorller : ControllerBase
 {
