@@ -31,7 +31,7 @@ public class AccountController : ControllerBase
     [HttpPost("verify-initdata")]
     public async Task<IActionResult> ValidateEitaaInitData([FromBody] VerifyInitdataDto dto)
     {
-        var user = _accountRepository.SaveChangesInMiniUser(new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata));
+        var user = await _accountRepository.SaveChangesInMiniUser(new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata));
         var initData = _accountRepository.ParseUrlEncodedData(dto.Initdata);
         var botToken = _accountRepository.GetBotToken();
 
@@ -55,7 +55,7 @@ public class AccountController : ControllerBase
         {
             await _accountRepository.SetIsValidTrue(user);
             var token = _tokenService.CreateToken(user, null);
-            return Ok(new { token = token });
+            return Ok(new { Token = token });
         }
 
         return Unauthorized("Invalid data.");

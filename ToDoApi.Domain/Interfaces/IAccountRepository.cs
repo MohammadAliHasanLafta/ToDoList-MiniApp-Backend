@@ -10,7 +10,7 @@ namespace ToDoApi.Domain.Interfaces
     public interface IAccountRepository
     {
         public Task SaveChangesInWebUsers(string phoneNumber, string otp);
-        public MiniAppUser SaveChangesInMiniUser(MiniAppUser user);
+        public Task<MiniAppUser> SaveChangesInMiniUser(MiniAppUser user);
         public MiniAppUser GetUserById(long userId);
         public WebAppUser GetUserByNumber(string phoneNumber);
         public byte[] GenerateHmacSha256(string key, string message);

@@ -27,5 +27,12 @@ public class AppDbContext : DbContext
             entity.HasCheckConstraint("CK_UserIdOrPhoneNumber",
                 "[UserId] IS NOT NULL OR [UserPhoneNumber] IS NOT NULL");
         });
+
+        modelBuilder.Entity<MiniAppUser>()
+        .HasKey(u => u.Id);
+
+        modelBuilder.Entity<MiniAppUser>()
+            .Property(u => u.Id)
+            .ValueGeneratedOnAdd();
     }
 }

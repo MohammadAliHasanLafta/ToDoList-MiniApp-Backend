@@ -29,24 +29,26 @@ namespace ToDoApi.Infrastructure.Repositpry
         public async Task SetIsValidTrue(MiniAppUser user)
         {
             user.IsValid = true;
-            _context.MiniAppUsers.Update(user);
+            _context.MiniAppUsers.Attach(user);
+            _context.Entry(user).State = EntityState.Modified; 
+            await _context.SaveChangesAsync();
         }
 
-        public MiniAppUser SaveChangesInMiniUser(MiniAppUser miniAppUser)
+        public async Task<MiniAppUser> SaveChangesInMiniUser(MiniAppUser miniAppUser)
         {
             var user = GetUserById(miniAppUser.UserId);
             if (user == null)
             {
-                user = miniAppUser;
-                _context.MiniAppUsers.AddAsync(user);
-                return user;
+                await _context.MiniAppUsers.AddAsync(miniAppUser);
+                await _context.SaveChangesAsync();
+                return miniAppUser;
             }
             else
             {
                 user.Initdata = miniAppUser.Initdata;
-                _context.MiniAppUsers.Update(user);
+                user.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
             }
-            _context.SaveChangesAsync();
             return user;
         }
 
@@ -61,9 +63,9 @@ namespace ToDoApi.Infrastructure.Repositpry
             else
             {
                 user.Otp = otp;
-                _context.WebAppUsers.Update(user);
+                user.UpdatedAt = DateTime.Now;
+                _context.SaveChangesAsync();
             }
-            _context.SaveChangesAsync();
         }
 
         public MiniAppUser GetUserById(long userId)
