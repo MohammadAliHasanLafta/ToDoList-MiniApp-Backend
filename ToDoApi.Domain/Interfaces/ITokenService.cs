@@ -9,5 +9,5 @@ namespace ToDoApi.Domain.Interfaces;
 
 public interface ITokenService
 {
-    string CreateToken(MiniAppUser user);
+    string CreateToken(MiniAppUser? miniAppUser, WebAppUser? webAppUser);
 }

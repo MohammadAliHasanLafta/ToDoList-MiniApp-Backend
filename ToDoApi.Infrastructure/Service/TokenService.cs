@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
 
@@ -21,13 +22,26 @@ namespace ToDoApi.Infrastructure.Service
             _configuration = configuration;
         }
 
-        public string CreateToken(MiniAppUser user)
+        public string CreateToken(MiniAppUser miniAppUser, WebAppUser webAppUser)
         {
-            var authClaims = new List<Claim>
-        {
-            new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
-            new Claim(ClaimTypes.NameIdentifier, user.FirstName),
-        };
+            var authClaims = new List<Claim>();
+            if (miniAppUser != null)
+            {
+                authClaims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, miniAppUser.FirstName),
+                    new Claim(ClaimTypes.NameIdentifier, miniAppUser.LastName),
+                };
+            }
+
+            else
+            {
+                authClaims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, webAppUser.PhoneNumber),
+                    new Claim(ClaimTypes.MobilePhone, webAppUser.PhoneNumber),
+                };
+            }
 
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
 

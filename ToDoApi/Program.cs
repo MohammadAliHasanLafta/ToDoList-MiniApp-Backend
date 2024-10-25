@@ -15,18 +15,21 @@ using ToDoApi.Infrastructure.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//builder.WebHost.ConfigureKestrel(options =>
-//{
-//    options.ListenAnyIP(7298); 
-//});
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins", policy =>
     {
-        policy.AllowAnyOrigin() 
-              .AllowAnyHeader() 
-              .AllowAnyMethod(); 
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ConfigureHttpsDefaults(listenOptions =>
+    {
+        listenOptions.SslProtocols = System.Security.Authentication.SslProtocols.Tls12 | System.Security.Authentication.SslProtocols.Tls13;
     });
 });
 
@@ -44,7 +47,7 @@ builder.Services.AddScoped<IToDoRepository, ToDoRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IOtpService, OtpService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
-//builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 //builder.Services.AddScoped<IProfileService, ProfileService>();
 
 builder.Services.AddHttpContextAccessor();
@@ -88,6 +91,8 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 app.UseCors("AllowAllOrigins");
+
+app.UseHttpsRedirection();
 
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1"));

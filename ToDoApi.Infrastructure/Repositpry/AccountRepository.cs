@@ -1,51 +1,74 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 using System.Text;
+using System.Web;
 using Telegram.Bot.Types;
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
 using ToDoApi.Infrastructure.Data;
+using static System.Net.WebRequestMethods;
 
 namespace ToDoApi.Infrastructure.Repositpry
 {
     public class AccountRepository : IAccountRepository
     {
         private readonly AppDbContext _context;
-        private readonly string _telegramToken = "7921489724:AAFgEnfdofhXdpAUFlO5TBAVwFBAE2PV6Uw";
+        private readonly string _eitaaToken = "60315349:4BLmgjuTJR-%94mHOf5GA-blA0nTf12J-T~OWILRsgk-yw6}J5qY9E-KlrW/yG4S*-RmKtx909&p-AVZwLgQl3s-1UI#oJxc!w-8XDWmUF3]{-7SB7RLXMt6-ShC8P*NXEW-p.kJQrIrMQ-laQc,Cj)uF-pFYOIoS";
 
         public AccountRepository(AppDbContext context)
         {
             _context = context;
         }
 
-        public async Task<long> AddUser(MiniAppUser user)
+        public string GetBotToken()
         {
-            _context.MiniAppUsers.AddAsync(user);
-            _context.SaveChanges();
-
-            Console.WriteLine("Hello Hello!");
-            return user.UserId;
+            return _eitaaToken;
         }
 
-        public async Task SaveChangesInUsers(string phoneNumber, string otp)
+        public async Task SetIsValidTrue(MiniAppUser user)
         {
-            var user = _context.WebAppUsers.SingleOrDefault(u => u.PhoneNumber == phoneNumber);
+            user.IsValid = true;
+            _context.MiniAppUsers.Update(user);
+        }
+
+        public MiniAppUser SaveChangesInMiniUser(MiniAppUser miniAppUser)
+        {
+            var user = GetUserById(miniAppUser.UserId);
+            if (user == null)
+            {
+                user = miniAppUser;
+                _context.MiniAppUsers.AddAsync(user);
+                return user;
+            }
+            else
+            {
+                user.Initdata = miniAppUser.Initdata;
+                _context.MiniAppUsers.Update(user);
+            }
+            _context.SaveChangesAsync();
+            return user;
+        }
+
+        public async Task SaveChangesInWebUsers(string phoneNumber, string otp)
+        {
+            var user = GetUserByNumber(phoneNumber);
             if (user == null)
             {
                 user = new WebAppUser(phoneNumber, otp);
-                await _context.WebAppUsers.AddAsync(user);
+                _context.WebAppUsers.AddAsync(user);
             }
             else
             {
                 user.Otp = otp;
                 _context.WebAppUsers.Update(user);
             }
-            await _context.SaveChangesAsync();
+            _context.SaveChangesAsync();
         }
 
-        public bool UserIsExistById(long userId)
+        public MiniAppUser GetUserById(long userId)
         {
-            return _context.MiniAppUsers.Any(u => u.UserId == userId);
+            return _context.MiniAppUsers.FirstOrDefault(u => u.UserId == userId);
         }
 
         public WebAppUser GetUserByNumber(string phoneNumber)
@@ -53,31 +76,27 @@ namespace ToDoApi.Infrastructure.Repositpry
             return _context.WebAppUsers.FirstOrDefault(u => u.PhoneNumber == phoneNumber);
         }
 
-        //public bool VerifyTelegramInitData(string initData)
-        //{
-        //    var secretKey = Encoding.UTF8.GetBytes("WebAppData" + _telegramToken);
-        //    using var hmac = new HMACSHA256(secretKey);
+        public byte[] GenerateHmacSha256(string key, string message)
+        {
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key)))
+            {
+                return hmac.ComputeHash(Encoding.UTF8.GetBytes(message));
+            }
+        }
 
-        //    var initDataHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(initData));
+        public string GenerateHmacSha256(byte[] key, string message)
+        {
+            using (var hmac = new HMACSHA256(key))
+            {
+                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(message));
+                return BitConverter.ToString(hash).Replace("-", "").ToLower();
+            }
+        }
 
-        //    // Validate initData with the expected hash (from Telegram)
-        //    var hash = ExtractHashFromInitData(initData); // Implement this function
-        //    return initDataHash.SequenceEqual(hash);
-        //}
-
-        //public AppUser ParseUserData(string initData)
-        //{
-        //    var parsedData = System.Web.HttpUtility.ParseQueryString(initData);
-        //    return new AppUser(parsedData["id"], parsedData["first_name"], parsedData["username"]);
-
-        //}
-
-        //public byte[] ExtractHashFromInitData(string initData)
-        //{
-        //    var parsedData = System.Web.HttpUtility.ParseQueryString(initData);
-        //    var hashString = parsedData["hash"];
-        //    return Convert.FromBase64String(hashString);
-        //}
+        public Dictionary<string, string> ParseUrlEncodedData(string encodedData)
+        {
+            var query = HttpUtility.ParseQueryString(encodedData);
+            return query.AllKeys.ToDictionary(key => key, key => query[key]);
+        }
     }
-
 }

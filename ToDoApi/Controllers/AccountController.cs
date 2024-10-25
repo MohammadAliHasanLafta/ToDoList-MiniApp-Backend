@@ -1,8 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using ToDoApi.Application.AccountCommandsQueries.Create;
 using ToDoApi.Core.ToDoDtosProfiles.Dtos;
+using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
+using static System.Net.WebRequestMethods;
 
 namespace ToDoApi.Application.Controllers;
 
@@ -14,18 +19,46 @@ public class AccountController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IAccountRepository _accountRepository;
     //private readonly IOtpService _otpService;
+    private readonly ITokenService _tokenService;
 
-    public AccountController(IMediator mediator, IAccountRepository accountRepository)
+    public AccountController(IMediator mediator, IAccountRepository accountRepository, ITokenService tokenService)
     {
         _mediator = mediator;
         _accountRepository = accountRepository;
+        _tokenService = tokenService;
     }
 
     [HttpPost("verify-initdata")]
-    public async Task<ActionResult<long>> VerifyInitData(CreateAccountCommand command)
+    public async Task<IActionResult> ValidateEitaaInitData([FromBody] VerifyInitdataDto dto)
     {
-        var result = await _mediator.Send(command);
-        return Ok(result);
+        var user = _accountRepository.SaveChangesInMiniUser(new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata));
+        var initData = _accountRepository.ParseUrlEncodedData(dto.Initdata);
+        var botToken = _accountRepository.GetBotToken();
+
+        if (!initData.TryGetValue("hash", out string receivedHash))
+        {
+            return BadRequest("Missing 'hash' parameter.");
+        }
+
+        initData.Remove("hash");
+
+        var sortedData = initData.OrderBy(kvp => kvp.Key);
+
+        var dataCheckString = string.Join("\n", sortedData.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+
+        var secretKey = _accountRepository.GenerateHmacSha256("WebAppData", botToken);
+
+        var generatedHash = _accountRepository.GenerateHmacSha256(secretKey, dataCheckString);
+
+        if (CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(generatedHash), Encoding.UTF8.GetBytes(receivedHash)))
+        {
+            await _accountRepository.SetIsValidTrue(user);
+            var token = _tokenService.CreateToken(user, null);
+            return Ok(new { token = token });
+        }
+
+        return Unauthorized("Invalid data.");
     }
 
     [HttpPost("send-otp")]
@@ -40,7 +73,7 @@ public class AccountController : ControllerBase
         //    return StatusCode(500, "Failed to send OTP.");
         var otp = "123456";
 
-        await _accountRepository.SaveChangesInUsers(dto.PhoneNumber, otp);
+        await _accountRepository.SaveChangesInWebUsers(dto.PhoneNumber, otp);
 
         return Ok("OTP sent successfully.");
     }
@@ -49,6 +82,7 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto dto)
     {
         var user = _accountRepository.GetUserByNumber(dto.PhoneNumber);
+        var token = "";
 
         if (user == null)
             return Unauthorized("User not found.");
@@ -56,6 +90,8 @@ public class AccountController : ControllerBase
         if (user.Otp != dto.Otp)
             return Unauthorized($"Invalid OTP. Received: {dto.Otp}, Expected: {user.Otp}");
 
-        return Ok(user);
+        token = _tokenService.CreateToken(null, user);
+
+        return Ok(new { Token = token });
     }
 }

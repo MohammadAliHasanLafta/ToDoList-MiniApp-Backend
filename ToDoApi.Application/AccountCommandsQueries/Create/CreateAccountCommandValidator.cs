@@ -15,7 +15,7 @@ public class CreateAccountCommandValidator : AbstractValidator<CreateAccountComm
         RuleFor(x => x.FirstName).NotEmpty().WithMessage("Firsname is required");
         RuleFor(x => x.UserId).NotEmpty().WithMessage("UserId is required");
         RuleFor(x => x.InitData).NotEmpty().WithMessage("Initdata is required");
-        RuleFor(x => x.UserName).NotEmpty().WithMessage("Username is required");
+        RuleFor(x => x.LastName).NotEmpty().WithMessage("Lastname is required");
     }
 
 }

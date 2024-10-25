@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ToDoApi.Application.AccountCommandsQueries.Create;
 
-public class CreateAccountCommand : IRequest<long>
+public class CreateAccountCommand : IRequest<string>
 {
     public string? InitData { get; set; }
     public string? FirstName { get; set; }
-    public string? UserName { get; set; }
+    public string? LastName { get; set; }
     public long UserId { get; set; }
 }
