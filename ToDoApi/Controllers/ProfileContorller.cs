@@ -9,7 +9,6 @@ using ToDoApi.Domain.Entities;
 namespace ToDoApi.API.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("/")]
 public class ProfileContorller : ControllerBase
 {

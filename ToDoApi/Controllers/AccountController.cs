@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using ToDoApi.Application.AccountCommandsQueries.Create;
 using ToDoApi.Core.ToDoDtosProfiles.Dtos;
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
@@ -16,14 +15,12 @@ namespace ToDoApi.Application.Controllers;
 [Route("/")]
 public class AccountController : ControllerBase
 {
-    private readonly IMediator _mediator;
     private readonly IAccountRepository _accountRepository;
     //private readonly IOtpService _otpService;
     private readonly ITokenService _tokenService;
 
-    public AccountController(IMediator mediator, IAccountRepository accountRepository, ITokenService tokenService)
+    public AccountController(IAccountRepository accountRepository, ITokenService tokenService)
     {
-        _mediator = mediator;
         _accountRepository = accountRepository;
         _tokenService = tokenService;
     }
@@ -31,7 +28,6 @@ public class AccountController : ControllerBase
     [HttpPost("verify-initdata")]
     public async Task<IActionResult> ValidateEitaaInitData([FromBody] VerifyInitdataDto dto)
     {
-        var user = await _accountRepository.SaveChangesInMiniUser(new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata));
         var initData = _accountRepository.ParseUrlEncodedData(dto.Initdata);
         var botToken = _accountRepository.GetBotToken();
 
@@ -53,7 +49,23 @@ public class AccountController : ControllerBase
         if (CryptographicOperations.FixedTimeEquals(
             Encoding.UTF8.GetBytes(generatedHash), Encoding.UTF8.GetBytes(receivedHash)))
         {
-            await _accountRepository.SetIsValidTrue(user);
+            var user = await _accountRepository.GetUserById(dto.UserId);
+
+            if (user != null)
+            {
+                user.Initdata = dto.Initdata;
+                user.IsValid = true;
+                user.UpdatedAt = DateTime.Now;
+
+                await _accountRepository.SaveChangesAsync();
+            }
+            else
+            {
+                user = new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata, true);
+
+                await _accountRepository.AddUserAsync(user);
+            }
+
             var token = _tokenService.CreateToken(user, null);
             return Ok(new { Token = token });
         }

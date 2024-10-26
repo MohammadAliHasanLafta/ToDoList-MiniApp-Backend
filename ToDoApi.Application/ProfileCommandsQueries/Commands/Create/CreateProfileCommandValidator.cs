@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ToDoApi.Application.AccountCommandsQueries.Create;
 
 namespace ToDoApi.Application.ProfileCommandsQueries.Commands.Create;
 

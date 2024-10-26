@@ -10,7 +10,6 @@ using ToDoApi.Core.ToDoDtosProfiles.Dtos;
 namespace ToDoApi.API.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("/")]
 public class TodoController : ControllerBase
 {

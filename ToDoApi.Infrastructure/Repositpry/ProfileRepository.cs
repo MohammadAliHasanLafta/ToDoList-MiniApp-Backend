@@ -23,9 +23,10 @@ public class ProfileRepository : IProfileRepository
         {
             return 0000;
         }
+
         var newProfile = new UserProfile(userName, email, userId, phoneNumber);
-        _context.Profiles.Add(newProfile);
-        _context.SaveChanges();
+        await _context.Profiles.AddAsync(newProfile);
+        await _context.SaveChangesAsync();
 
         return newProfile.Id;
     }
@@ -34,15 +35,24 @@ public class ProfileRepository : IProfileRepository
     {
         var profile = new UserProfile();
         var profileIsExist = await ProfileIsExist(userId, phoneNumber);
+        Console.WriteLine(profileIsExist);
+
         if (!profileIsExist)
         {
             var id = await Create("نام کاربر", "example@gmail.com", userId, phoneNumber);
-            profile = _context.Profiles.FirstOrDefault(p => p.Id == id);
+            profile = await _context.Profiles.FirstOrDefaultAsync(p => p.Id == id);
         }
         else
-            profile = _context.Profiles.FirstOrDefault(p => p.UserId == userId || p.PhoneNumber == phoneNumber);
-
-        _context.SaveChanges();
+        {
+            if (userId != 0)
+            {
+                profile = await _context.Profiles.FirstOrDefaultAsync(p => p.UserId == userId);
+            }
+            else
+            {
+                profile = await _context.Profiles.FirstOrDefaultAsync(p => p.PhoneNumber == phoneNumber);
+            }
+        }
 
         return profile;
     }
@@ -67,7 +77,7 @@ public class ProfileRepository : IProfileRepository
         var profile = await GetById(Id);
 
         if (profile == null) return false;
-        
+
         _context.Profiles.Remove(profile);
         _context.SaveChanges();
 
@@ -77,10 +87,19 @@ public class ProfileRepository : IProfileRepository
 
     }
 
-    public Task<bool> ProfileIsExist(long userId, string phoneNumber)
+    public async Task<bool> ProfileIsExist(long userId, string phoneNumber)
     {
-        var profileisExist = _context.Profiles.AnyAsync(p => p.UserId == userId || p.PhoneNumber == phoneNumber);
-        return profileisExist;
+        if (userId > 0)
+        {
+            return await _context.Profiles.AnyAsync(p => p.UserId == userId);
+        }
+
+        if (!string.IsNullOrEmpty(phoneNumber))
+        {
+            return await _context.Profiles.AnyAsync(p => p.PhoneNumber == phoneNumber);
+        }
+
+        return false;
     }
 
     public async Task<UserProfile> GetById(long Id)
@@ -93,15 +112,18 @@ public class ProfileRepository : IProfileRepository
     public async void DeleteTodosOfUser(long? userId, string phoneNumber)
     {
         var todos = new List<ToDoItem>();
-        if (phoneNumber != null)
+        if (userId > 0 || phoneNumber != null)
+        {
             todos = _context.TodoItems
             .Where(todo => todo.UserPhoneNumber == phoneNumber && todo.IsDeleted == false)
             .ToList();
-
-
-        todos = _context.TodoItems
+        }
+        else
+        {
+            todos = _context.TodoItems
             .Where(todo => todo.UserId == userId && todo.IsDeleted == false)
             .ToList();
+        }
 
         if (todos.Any())
         {

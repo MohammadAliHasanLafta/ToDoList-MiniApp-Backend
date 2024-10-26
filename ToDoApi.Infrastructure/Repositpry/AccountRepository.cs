@@ -26,30 +26,15 @@ namespace ToDoApi.Infrastructure.Repositpry
             return _eitaaToken;
         }
 
-        public async Task SetIsValidTrue(MiniAppUser user)
+        public async Task SaveChangesAsync()
         {
-            user.IsValid = true;
-            _context.MiniAppUsers.Attach(user);
-            _context.Entry(user).State = EntityState.Modified; 
             await _context.SaveChangesAsync();
         }
 
-        public async Task<MiniAppUser> SaveChangesInMiniUser(MiniAppUser miniAppUser)
+        public async Task AddUserAsync(MiniAppUser user)
         {
-            var user = GetUserById(miniAppUser.UserId);
-            if (user == null)
-            {
-                await _context.MiniAppUsers.AddAsync(miniAppUser);
-                await _context.SaveChangesAsync();
-                return miniAppUser;
-            }
-            else
-            {
-                user.Initdata = miniAppUser.Initdata;
-                user.UpdatedAt = DateTime.Now;
-                await _context.SaveChangesAsync();
-            }
-            return user;
+            await _context.MiniAppUsers.AddAsync(user);
+            await SaveChangesAsync();
         }
 
         public async Task SaveChangesInWebUsers(string phoneNumber, string otp)
@@ -59,6 +44,7 @@ namespace ToDoApi.Infrastructure.Repositpry
             {
                 user = new WebAppUser(phoneNumber, otp);
                 _context.WebAppUsers.AddAsync(user);
+                _context.SaveChangesAsync();
             }
             else
             {
@@ -68,9 +54,11 @@ namespace ToDoApi.Infrastructure.Repositpry
             }
         }
 
-        public MiniAppUser GetUserById(long userId)
+        public async Task<MiniAppUser> GetUserById(long userId)
         {
-            return _context.MiniAppUsers.FirstOrDefault(u => u.UserId == userId);
+            return await _context.MiniAppUsers
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.UserId == userId);
         }
 
         public WebAppUser GetUserByNumber(string phoneNumber)
