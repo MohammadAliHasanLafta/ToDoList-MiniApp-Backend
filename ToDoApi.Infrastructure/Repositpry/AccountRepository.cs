@@ -28,7 +28,33 @@ namespace ToDoApi.Infrastructure.Repositpry
 
         public async Task SaveChangesAsync()
         {
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
+        }
+
+        public async Task UpdateInMiniUsers(long userId, string contactRequest, string mobile)
+        {
+            // ابتدا شیء را بدون ردیابی پیدا کنید
+            var user = await GetUserById(userId);
+
+            if (user != null)
+            {
+                //// اتصال شیء به DbContext
+                //_context.MiniAppUsers.Attach(user);
+
+                //// اعمال تغییرات
+                user.ContactRequest = contactRequest;
+                user.Mobile = mobile;
+                user.IsValid = true;
+                user.UpdatedAt = DateTime.Now;
+
+                //// علامت گذاری شیء به عنوان تغییر یافته
+                //_context.Entry(user).State = EntityState.Modified;
+
+
+
+                // ذخیره تغییرات
+                _context.SaveChanges();
+            }
         }
 
         public async Task AddUserAsync(MiniAppUser user)
@@ -54,11 +80,9 @@ namespace ToDoApi.Infrastructure.Repositpry
             }
         }
 
-        public async Task<MiniAppUser> GetUserById(long userId)
+        public Task<MiniAppUser> GetUserById(long userId)
         {
-            return await _context.MiniAppUsers
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.UserId == userId);
+            return _context.MiniAppUsers.FirstOrDefaultAsync(u => u.UserId == userId);
         }
 
         public WebAppUser GetUserByNumber(string phoneNumber)

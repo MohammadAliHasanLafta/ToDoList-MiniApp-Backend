@@ -15,6 +15,7 @@ namespace ToDoApi.Application.Controllers;
 [Route("/")]
 public class AccountController : ControllerBase
 {
+    string i = "contact={\"user_id\":9893096,\"first_name\":\"محمد+علی\",\"phone\":\"989908014940\"}&auth_date=1730710299&hash=8f63fe9b2e871ff24a167b6d0cc5fce0e2410f18ae9490cb00aea1633348508b";
     private readonly IAccountRepository _accountRepository;
     //private readonly IOtpService _otpService;
     private readonly ITokenService _tokenService;
@@ -61,9 +62,47 @@ public class AccountController : ControllerBase
             }
             else
             {
-                user = new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata, true);
+                user = new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata, "", "", true);
 
                 await _accountRepository.AddUserAsync(user);
+            }
+
+            var token = _tokenService.CreateToken(user, null);
+            return Ok(new { Token = token });
+        }
+
+        return Unauthorized("Invalid data.");
+    }
+
+    [HttpPost("verify-contact")]
+    public async Task<IActionResult> ValidateEitaaContact([FromBody] VerifyContactDto dto)
+    {
+        var initData = _accountRepository.ParseUrlEncodedData(dto.ContactRequest);
+        var botToken = _accountRepository.GetBotToken();
+
+        if (!initData.TryGetValue("hash", out string receivedHash))
+        {
+            return BadRequest("Missing 'hash' parameter.");
+        }
+
+        initData.Remove("hash");
+
+        var sortedData = initData.OrderBy(kvp => kvp.Key);
+
+        var dataCheckString = string.Join("\n", sortedData.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+
+        var secretKey = _accountRepository.GenerateHmacSha256("WebAppData", botToken);
+
+        var generatedHash = _accountRepository.GenerateHmacSha256(secretKey, dataCheckString);
+
+        if (CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(generatedHash), Encoding.UTF8.GetBytes(receivedHash)))
+        {
+            var user = await _accountRepository.GetUserById(dto.UserId);
+
+            if (user != null)
+            {
+                await _accountRepository.UpdateInMiniUsers(dto.UserId, dto.ContactRequest, dto.Mobile);
             }
 
             var token = _tokenService.CreateToken(user, null);

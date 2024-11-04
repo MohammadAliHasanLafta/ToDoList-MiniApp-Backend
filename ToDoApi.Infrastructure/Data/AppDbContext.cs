@@ -17,6 +17,8 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<ToDoItem>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -30,9 +32,5 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<MiniAppUser>()
         .HasKey(u => u.Id);
-
-        modelBuilder.Entity<MiniAppUser>()
-            .Property(u => u.Id)
-            .ValueGeneratedOnAdd();
     }
 }
