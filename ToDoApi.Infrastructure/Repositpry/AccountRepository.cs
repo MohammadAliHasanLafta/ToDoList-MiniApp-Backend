@@ -31,31 +31,6 @@ namespace ToDoApi.Infrastructure.Repositpry
             _context.SaveChanges();
         }
 
-        public async Task UpdateInMiniUsers(long userId, string contactRequest, string mobile)
-        {
-            // ابتدا شیء را بدون ردیابی پیدا کنید
-            var user = await GetUserById(userId);
-
-            if (user != null)
-            {
-                //// اتصال شیء به DbContext
-                //_context.MiniAppUsers.Attach(user);
-
-                //// اعمال تغییرات
-                user.ContactRequest = contactRequest;
-                user.Mobile = mobile;
-                user.IsValid = true;
-                user.UpdatedAt = DateTime.Now;
-
-                //// علامت گذاری شیء به عنوان تغییر یافته
-                //_context.Entry(user).State = EntityState.Modified;
-
-
-
-                // ذخیره تغییرات
-                _context.SaveChanges();
-            }
-        }
 
         public async Task AddUserAsync(MiniAppUser user)
         {
@@ -82,7 +57,7 @@ namespace ToDoApi.Infrastructure.Repositpry
 
         public Task<MiniAppUser> GetUserById(long userId)
         {
-            return _context.MiniAppUsers.FirstOrDefaultAsync(u => u.UserId == userId);
+            return _context.MiniAppUsers.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == userId);
         }
 
         public WebAppUser GetUserByNumber(string phoneNumber)
@@ -111,6 +86,27 @@ namespace ToDoApi.Infrastructure.Repositpry
         {
             var query = HttpUtility.ParseQueryString(encodedData);
             return query.AllKeys.ToDictionary(key => key, key => query[key]);
+        }
+
+        public async Task AddContactAsync(MiniAppUserContact contact)
+        {
+            await _context.Contacts.AddAsync(contact);
+            await SaveChangesAsync();
+        }
+
+        public async Task<MiniAppUserContact> GetContactById(long userId)
+        {
+            return _context.Contacts.AsNoTracking().FirstOrDefault(u => u.UserId == userId);
+        }
+
+        public async Task<string> GetUserMobile(long userId)
+        {
+            var user = await _context.Contacts.FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (user == null)
+                return null;
+
+            return user.Mobile;
         }
     }
 }

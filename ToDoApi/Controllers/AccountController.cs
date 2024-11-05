@@ -15,7 +15,6 @@ namespace ToDoApi.Application.Controllers;
 [Route("/")]
 public class AccountController : ControllerBase
 {
-    string i = "contact={\"user_id\":9893096,\"first_name\":\"محمد+علی\",\"phone\":\"989908014940\"}&auth_date=1730710299&hash=8f63fe9b2e871ff24a167b6d0cc5fce0e2410f18ae9490cb00aea1633348508b";
     private readonly IAccountRepository _accountRepository;
     //private readonly IOtpService _otpService;
     private readonly ITokenService _tokenService;
@@ -62,7 +61,7 @@ public class AccountController : ControllerBase
             }
             else
             {
-                user = new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata, "", "", true);
+                user = new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata, true);
 
                 await _accountRepository.AddUserAsync(user);
             }
@@ -98,15 +97,25 @@ public class AccountController : ControllerBase
         if (CryptographicOperations.FixedTimeEquals(
             Encoding.UTF8.GetBytes(generatedHash), Encoding.UTF8.GetBytes(receivedHash)))
         {
-            var user = await _accountRepository.GetUserById(dto.UserId);
+            var user = await _accountRepository.GetContactById(dto.UserId);
 
             if (user != null)
             {
-                await _accountRepository.UpdateInMiniUsers(dto.UserId, dto.ContactRequest, dto.Mobile);
+                user.ContactRequest = dto.ContactRequest;
+                user.Mobile = dto.Mobile;
+                user.IsValid = true;
+                user.UpdatedAt = DateTime.Now;
+
+                await _accountRepository.SaveChangesAsync();
+            }
+            else
+            {
+                user = new MiniAppUserContact(dto.UserId, dto.ContactRequest, dto.Mobile, true);
+
+                await _accountRepository.AddContactAsync(user);
             }
 
-            var token = _tokenService.CreateToken(user, null);
-            return Ok(new { Token = token });
+            return Ok("success verify!");
         }
 
         return Unauthorized("Invalid data.");
@@ -144,5 +153,16 @@ public class AccountController : ControllerBase
         token = _tokenService.CreateToken(null, user);
 
         return Ok(new { Token = token });
+    }
+
+    [HttpGet("get-miniappuser-mobile")]
+    public async Task<IActionResult> GetMiniAppUserMobile([FromQuery] long UserId)
+    {
+        var mobile = await _accountRepository.GetUserMobile(UserId);
+
+        if (mobile == null)
+            return Ok(false);
+
+        return Ok(mobile);
     }
 }

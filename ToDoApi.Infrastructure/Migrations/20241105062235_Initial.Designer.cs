@@ -12,7 +12,7 @@ using ToDoApi.Infrastructure.Data;
 namespace ToDoApi.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241104125921_Initial")]
+    [Migration("20241105062235_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -33,10 +33,6 @@ namespace ToDoApi.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("ContactRequest")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -56,8 +52,41 @@ namespace ToDoApi.Infrastructure.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MiniAppUsers");
+                });
+
+            modelBuilder.Entity("ToDoApi.Domain.Entities.MiniAppUserContact", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ContactRequest")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsValid")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("MiniAppUserId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Mobile")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -68,7 +97,10 @@ namespace ToDoApi.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MiniAppUsers");
+                    b.HasIndex("MiniAppUserId")
+                        .IsUnique();
+
+                    b.ToTable("Contacts");
                 });
 
             modelBuilder.Entity("ToDoApi.Domain.Entities.ToDoItem", b =>
@@ -181,6 +213,17 @@ namespace ToDoApi.Infrastructure.Migrations
                     b.ToTable("WebAppUsers");
                 });
 
+            modelBuilder.Entity("ToDoApi.Domain.Entities.MiniAppUserContact", b =>
+                {
+                    b.HasOne("ToDoApi.Domain.Entities.MiniAppUser", "MiniAppUser")
+                        .WithOne("Contact")
+                        .HasForeignKey("ToDoApi.Domain.Entities.MiniAppUserContact", "MiniAppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MiniAppUser");
+                });
+
             modelBuilder.Entity("ToDoApi.Domain.Entities.UserProfile", b =>
                 {
                     b.HasOne("ToDoApi.Domain.Entities.MiniAppUser", "MiniAppUser")
@@ -194,6 +237,12 @@ namespace ToDoApi.Infrastructure.Migrations
                     b.Navigation("MiniAppUser");
 
                     b.Navigation("WebAppUser");
+                });
+
+            modelBuilder.Entity("ToDoApi.Domain.Entities.MiniAppUser", b =>
+                {
+                    b.Navigation("Contact")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

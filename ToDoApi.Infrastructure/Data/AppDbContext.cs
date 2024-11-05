@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using Telegram.Bot.Types;
 using ToDoApi.Domain.Entities;
 
 namespace ToDoApi.Infrastructure.Data;
@@ -14,7 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<MiniAppUser> MiniAppUsers { get; set; }
     public DbSet<WebAppUser> WebAppUsers { get; set; }
     public DbSet<UserProfile> Profiles { get; set; }
-
+    public DbSet<MiniAppUserContact> Contacts { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -32,5 +33,6 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<MiniAppUser>()
         .HasKey(u => u.Id);
+
     }
 }
