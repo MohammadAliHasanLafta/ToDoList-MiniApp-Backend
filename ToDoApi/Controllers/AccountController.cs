@@ -25,6 +25,54 @@ public class AccountController : ControllerBase
         _tokenService = tokenService;
     }
 
+    [HttpPost("verify-initdata-listshow")]
+    public async Task<IActionResult> ValidateEitaaInitData_Listshow([FromBody] VerifyInitdataDto dto)
+    {
+        var initData = _accountRepository.ParseUrlEncodedData(dto.Initdata);
+        var botToken = _accountRepository.GetBotToken_listshow();
+
+        if (!initData.TryGetValue("hash", out string receivedHash))
+        {
+            return BadRequest("Missing 'hash' parameter.");
+        }
+
+        initData.Remove("hash");
+
+        var sortedData = initData.OrderBy(kvp => kvp.Key);
+
+        var dataCheckString = string.Join("\n", sortedData.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+
+        var secretKey = _accountRepository.GenerateHmacSha256("WebAppData", botToken);
+
+        var generatedHash = _accountRepository.GenerateHmacSha256(secretKey, dataCheckString);
+
+        if (CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(generatedHash), Encoding.UTF8.GetBytes(receivedHash)))
+        {
+            var user = await _accountRepository.GetUserById(dto.UserId);
+
+            if (user != null)
+            {
+                user.Initdata = dto.Initdata;
+                user.IsValid = true;
+                user.UpdatedAt = DateTime.Now;
+
+                await _accountRepository.SaveChangesAsync();
+            }
+            else
+            {
+                user = new MiniAppUser(dto.UserId, dto.FirstName, dto.LastName, dto.Initdata, true);
+
+                await _accountRepository.AddUserAsync(user);
+            }
+
+            var token = _tokenService.CreateToken(user, null);
+            return Ok(new { Token = token });
+        }
+
+        return Unauthorized("Invalid data.");
+    }
+
     [HttpPost("verify-initdata")]
     public async Task<IActionResult> ValidateEitaaInitData([FromBody] VerifyInitdataDto dto)
     {

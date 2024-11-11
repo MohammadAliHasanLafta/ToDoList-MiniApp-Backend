@@ -15,6 +15,7 @@ namespace ToDoApi.Infrastructure.Repositpry
     {
         private readonly AppDbContext _context;
         private readonly string _eitaaToken = "60315349:4BLmgjuTJR-%94mHOf5GA-blA0nTf12J-T~OWILRsgk-yw6}J5qY9E-KlrW/yG4S*-RmKtx909&p-AVZwLgQl3s-1UI#oJxc!w-8XDWmUF3]{-7SB7RLXMt6-ShC8P*NXEW-p.kJQrIrMQ-laQc,Cj)uF-pFYOIoS";
+        private readonly string _eitaaToken_listshow = "60924294:Ig5PvdaJmp-0e1uEM$)Qe-FhaF!AGqVU-b~btH@jOoy-IdXTt@wjyJ-^Yg2puoeDK-JCtltrGmNC-Zys?oTDCnB-wqdQKiOUGW-&2PDKkZpu8-v8SxVge0v8-sm7jxUIwiB-1lIcn[!p6Q-~";
 
         public AccountRepository(AppDbContext context)
         {
@@ -24,6 +25,11 @@ namespace ToDoApi.Infrastructure.Repositpry
         public string GetBotToken()
         {
             return _eitaaToken;
+        }
+
+        public string GetBotToken_listshow()
+        {
+            return _eitaaToken_listshow;
         }
 
         public async Task SaveChangesAsync()

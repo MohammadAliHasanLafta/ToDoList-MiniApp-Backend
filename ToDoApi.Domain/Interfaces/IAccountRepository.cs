@@ -19,6 +19,7 @@ namespace ToDoApi.Domain.Interfaces
         public string GenerateHmacSha256(byte[] key, string message);
         public Dictionary<string, string> ParseUrlEncodedData(string encodedData);
         public string GetBotToken();
+        public string GetBotToken_listshow();
         public Task SaveChangesAsync();
         public Task AddUserAsync(MiniAppUser user);
     }
