@@ -51,6 +51,8 @@ builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 //builder.Services.AddScoped<IProfileService, ProfileService>();
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddHttpContextAccessor();
 
 

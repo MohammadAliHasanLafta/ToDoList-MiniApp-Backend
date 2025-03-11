@@ -1,13 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using Telegram.Bot.Types;
 using ToDoApi.Domain.Entities;
 using ToDoApi.Domain.Interfaces;
 using ToDoApi.Infrastructure.Data;
-using static System.Net.WebRequestMethods;
 
 namespace ToDoApi.Infrastructure.Repositpry
 {
@@ -15,7 +12,7 @@ namespace ToDoApi.Infrastructure.Repositpry
     {
         private readonly AppDbContext _context;
         private readonly string _eitaaToken = "60315349:4BLmgjuTJR-%94mHOf5GA-blA0nTf12J-T~OWILRsgk-yw6}J5qY9E-KlrW/yG4S*-RmKtx909&p-AVZwLgQl3s-1UI#oJxc!w-8XDWmUF3]{-7SB7RLXMt6-ShC8P*NXEW-p.kJQrIrMQ-laQc,Cj)uF-pFYOIoS";
-        private readonly string _eitaaToken_listshow = "60924294:Ig5PvdaJmp-0e1uEM$)Qe-FhaF!AGqVU-b~btH@jOoy-IdXTt@wjyJ-^Yg2puoeDK-JCtltrGmNC-Zys?oTDCnB-wqdQKiOUGW-&2PDKkZpu8-v8SxVge0v8-sm7jxUIwiB-1lIcn[!p6Q-~";
+        private readonly string _eitaaToken_listshow = "60924294:xx5wbg-aa~Jd5-eAz4bL-Dpw0!8-f[QYT2-bffLZ0-WtSGkr-qO4nhe-YIpV@D-#CiVYA-23*dnM-8Aa7I&-OkXfwu-e)AujC-WX%B.9-Fzl!tQ-IT)hvy-LJE9nJ-mP]gae-]KcX2H-fVi14x-r/1FEU-hi[P5r-sW,c^L-K5ygMj-9AgqF3-UehnR8-oNc43#-~Cx^pD-S5Yp&z-bx@TGi-sK";
 
         public AccountRepository(AppDbContext context)
         {

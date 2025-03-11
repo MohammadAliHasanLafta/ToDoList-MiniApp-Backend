@@ -10,11 +10,11 @@ namespace ToDoApi.API.Controllers;
 
 [ApiController]
 [Route("/")]
-public class ProfileContorller : ControllerBase
+public class ProfileController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public ProfileContorller(IMediator mediator)
+    public ProfileController(IMediator mediator)
     {
         _mediator = mediator;
     }

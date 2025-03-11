@@ -7,4 +7,5 @@ public class VerifyInitdataDto
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Initdata { get; set; }
+    public string? IpAddress { get; set; }
 }
